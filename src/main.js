@@ -36,6 +36,7 @@ passport.use(
 )
 
 app.get('/auth/error', (req, res) => res.send('Unknown Error'))
+app.set('trust proxy', true)
 
 app.use(
   cookieSession({

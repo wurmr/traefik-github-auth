@@ -1,6 +1,7 @@
 FROM node:lts AS builder
 WORKDIR /app
 COPY . .
+ENV NODE_ENV production
 RUN npm ci
 RUN npm run build
 
