@@ -41,10 +41,11 @@ app.set('trust proxy', true)
 app.use(
   cookieSession({
     name: 'github-auth',
-    keys: ['foo', 'bar'],
+    secret: process.env.COOKIE_SECRET,
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     domain: process.env.COOKIE_DOMAIN,
+    maxAge: 60 * 60 * 1000,
   })
 )
 app.use(passport.initialize())
@@ -54,20 +55,20 @@ app.get('/login', passport.authenticate('github'))
 
 app.get(
   '/auth/github/callback',
-  passport.authenticate('github', { failureRedirect: '/auth/error' }),
-  function (req, res) {
-    res.redirect('/')
-  }
+  passport.authenticate('github', {
+    successRedirect: '/',
+    failureRedirect: '/auth/error',
+  })
 )
 
 app.get('/', forceLogin, (req, res) => {
-  res.send(`OK`)
+  res.send(`<p>OK</p><a href='/logout'>logout</a>`)
 })
 
 app.get('/logout', (req, res) => {
   req.session.destroy
   req.logout()
-  res.redirect('/')
+  res.send(`<p>Logged out</p><a href='/login'>login</a>`)
 })
 
 app.listen(port, () => console.log(`running on port ${port}!`))
